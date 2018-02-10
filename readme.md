@@ -14,8 +14,11 @@ Checks cert.sh for certificates issued for a list of provided URLs as well as ce
 # How does it do this?
 
 Provide a list of urls
+
 For each url in list of urls, query cert.sh with a wildcard
+
 Parse the cert.sh HTML output to extract the date and subdomain
+
 If active flag set, this will try to connect to each of the newly found subdomains
 
 # Why would you want to use this?
