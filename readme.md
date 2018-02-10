@@ -9,7 +9,7 @@ go build
 
 # What does this thing do?
 
-Checks cert.sh for certificates issued for a list of provided URLs as well as certificates issued for subdomains of the provided URLs
+Checks cert.sh for certificates issued for a list of provided URLs as well as certificates issued for subdomains of the provided URLs. I.e. https://crt.sh/?q=%25.erkin.xyz
 
 # How does it do this?
 
