@@ -21,6 +21,8 @@ Parse the cert.sh HTML output to extract the date and subdomain
 
 If active flag set, this will try to connect to each of the newly found subdomains
 
+Will save output as csv by default, can specify json if you wish
+
 # Why would you want to use this?
 
 To identify externally accessible assets for a given url or domain. Sometimes these assets may have been forgotten about or be brand new and not properly tested from a security standpoint, making them juicy targets for hackers. My goal is not to build a tool to make it easier for hackers to find juicy targets, but to build a tool that anyone can use to help get a handle on their external presence.
