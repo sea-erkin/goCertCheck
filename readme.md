@@ -3,6 +3,7 @@
 ```
 git clone https://github.com/sea-erkin/goCertCheck.git
 cd goCertCheck
+go get golang.org/x/net/html
 go build
 ./goCertCheck -u=urls -a
 ```
