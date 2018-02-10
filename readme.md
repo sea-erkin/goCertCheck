@@ -7,6 +7,21 @@ go build
 ./goCertCheck -u=urls -a
 ```
 
+```
+./goCertCheck -h
+Usage of ./goCertCheck:
+  -u string
+    	-u list of urls in a new line delimited file. Url must be a valid URL
+  -a bool
+      -a (optional) active flag will try to connect to url on port 443 to see if active
+  -o string
+    	-o (optional) output format csv or json (default "csv")
+  -t int
+    	-t (optional) mintime as epoch will filter results to only show newer than mintime
+ 
+ ```
+
+
 # What does this thing do?
 
 Checks cert.sh for certificates issued for a list of provided URLs as well as certificates issued for subdomains of the provided URLs. I.e. https://crt.sh/?q=%25.erkin.xyz
