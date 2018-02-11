@@ -25,6 +25,7 @@ var (
 	minTimeFlag         = flag.Int("t", 0, "-t (optional) mintime as epoch will filter results to only show newer than mintime")
 	activeFlag          = flag.Bool("a", false, "-a (optional) active flag will try to connect to url on port 443 to see if active")
 	print               = fmt.Println
+	totalResults        = 0
 )
 
 const (
@@ -46,7 +47,15 @@ func main() {
 	// get cert sh entries
 	var urlEntriesMap = make(map[string][]CertShEntry)
 	for _, x := range urls {
+		print("Getting subdomains for url: " + x)
 		urlEntriesMap[x] = makeRequest(x)
+		totalResults += len(urlEntriesMap[x])
+		print("Total unfiltered results: " + strconv.Itoa(totalResults))
+	}
+
+	if totalResults == 0 {
+		print("No results, quitting.")
+		os.Exit(0)
 	}
 
 	// filter if mintime flag provided
@@ -59,6 +68,7 @@ func main() {
 				}
 			}
 			urlEntriesMap[k] = filteredValues
+			print("Filtered values for " + k + " : " + strconv.Itoa(len(filteredValues)))
 		}
 	}
 
@@ -68,6 +78,7 @@ func main() {
 			for i, x := range v {
 				if tryConnectUrl(x.Hostname) {
 					urlEntriesMap[k][i].Active = "Yes"
+					print("Active site: https://" + x.Hostname)
 				} else {
 					urlEntriesMap[k][i].Active = "No"
 				}
@@ -80,12 +91,10 @@ func main() {
 	for k, v := range urlEntriesMap {
 		entryResults := convertCertShEntryToResult(k, v)
 		results = append(results, entryResults...)
-		for _, x := range v {
-			print("ParentUrl: "+k, "Subdomain: "+x.Hostname, "Active: "+x.Active)
-		}
 	}
 
 	// save output
+	print("Saving results as " + *outputFormatFlag)
 	err = saveOutput(results)
 	if err != nil {
 		log.Fatal(err)
@@ -166,11 +175,21 @@ func makeRequest(rawurl string) []CertShEntry {
 
 	url := prepUrl(rawurl)
 
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
+	time.Sleep(500 * time.Millisecond)
+	timeout := time.Duration(TIMEOUT_WAIT * time.Second)
+	client := http.Client{
+		Timeout: timeout,
 	}
-
+	resp, err := client.Get(url)
+	if err != nil {
+		// if timeout, skip
+		if !strings.Contains(err.Error(), "Client.Timeout") {
+			log.Fatal(err)
+		} else {
+			print("Timeout: ", url)
+			return retval
+		}
+	}
 	defer resp.Body.Close()
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
@@ -195,6 +214,10 @@ func makeRequest(rawurl string) []CertShEntry {
 		}
 	}
 	f(doc)
+	// no records
+	if len(content) == 1 {
+		return retval
+	}
 	content = content[2:]
 
 	certShEntry := CertShEntry{}
@@ -238,7 +261,7 @@ func convertCertShEntryToResult(parentUrl string, entries []CertShEntry) []Resul
 		result.NotBefore = entry.NotBefore
 		result.NotBeforeEpoch = entry.NotBeforeEpoch
 
-		result.Url = entry.Hostname
+		result.Url = "https://" + entry.Hostname
 		result.ParentUrl = parentUrl
 		retval = append(retval, result)
 	}
