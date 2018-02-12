@@ -1,4 +1,5 @@
 # Build and run instructions
+Assuming you have Go installed and have set your gopath. If you get a gopath not set error, see https://stackoverflow.com/questions/21001387/how-do-i-set-the-gopath-environment-variable-on-ubuntu-what-file-must-i-edit
 
 ```
 git clone https://github.com/sea-erkin/goCertCheck.git
